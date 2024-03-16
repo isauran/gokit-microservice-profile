@@ -1,0 +1,5 @@
+###
+curl -d '{"id":"1234","Name":"Go Kit"}' -H "Content-Type: application/json" -X POST http://localhost:8080/profiles/
+
+###
+curl http://localhost:8080/profiles/1234

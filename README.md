@@ -1,0 +1,1 @@
+profile service - demonstrates how to use Go kit to write a microservice with a REST-ish API. It uses net/http and the excellent Gorilla web toolkit, standart library log/slog, load envirionment from .env with godotenv
