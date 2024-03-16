@@ -6,7 +6,8 @@ require (
 	github.com/go-kit/kit v0.13.0
 	github.com/go-kit/log v0.2.1
 	github.com/gorilla/mux v1.8.1
-	github.com/isauran/go-pkg v0.0.1
+	github.com/isauran/gokitlogger v0.0.1
+	github.com/isauran/slogger v0.0.1
 	github.com/joho/godotenv v1.5.1
 )
 

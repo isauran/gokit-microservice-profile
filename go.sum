@@ -6,7 +6,9 @@ github.com/go-logfmt/logfmt v0.6.0 h1:wGYYu3uicYdqXVgoYbvnkrPVXkuLM1p1ifugDMEdRi
 github.com/go-logfmt/logfmt v0.6.0/go.mod h1:WYhtIu8zTZfxdn5+rREduYbwxfcBr/Vr6KEVveWlfTs=
 github.com/gorilla/mux v1.8.1 h1:TuBL49tXwgrFYWhqrNgrUNEY92u81SPhu7sTdzQEiWY=
 github.com/gorilla/mux v1.8.1/go.mod h1:AKf9I4AEqPTmMytcMc0KkNouC66V3BtZ4qD5fmWSiMQ=
-github.com/isauran/go-pkg v0.0.1 h1:R0uKCJ4koBbFjj6HQJm8OELe4Kf+sAQQuYRx+f1iOfE=
-github.com/isauran/go-pkg v0.0.1/go.mod h1:Q1BZEckfBFmp5rX2G6e4YaXqcAqHrKkhfdFO7O31bMA=
+github.com/isauran/gokitlogger v0.0.1 h1:9Xmo5y9/jHjqxQl2IM2M5NTXwK6CjfafCZXVqtJlmBQ=
+github.com/isauran/gokitlogger v0.0.1/go.mod h1:e0drmm+J8BA9h3zrnY+v18/EBhZe8YPBGBggvSLwFyw=
+github.com/isauran/slogger v0.0.1 h1:OjZWxCT9yMeI6SwUN8XhSQXbHiaqeSzLlfjANQTt8nA=
+github.com/isauran/slogger v0.0.1/go.mod h1:7GAnDWNaD/poBx8NFbuVuA3fslCcduytasd54kynJPw=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=

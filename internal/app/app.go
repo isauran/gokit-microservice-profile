@@ -12,10 +12,11 @@ import (
 
 	"github.com/go-kit/log"
 	"github.com/gorilla/mux"
-	"github.com/isauran/go-pkg/logger"
 	"github.com/isauran/gokit-microservice-profile/internal/config"
 	customerService "github.com/isauran/gokit-microservice-profile/internal/service/customer"
 	profileService "github.com/isauran/gokit-microservice-profile/internal/service/profile"
+	"github.com/isauran/gokitlogger"
+	"github.com/isauran/slogger"
 )
 
 type App struct {
@@ -26,10 +27,7 @@ type App struct {
 }
 
 func NewApp(ctx context.Context) (*App, error) {
-	a := &App{
-		log:         logger.SlogJSONLogger(os.Stdout, slog.LevelDebug),
-		gokitLogger: logger.GoKitJSONLogger(os.Stderr),
-	}
+	a := &App{}
 	err := a.initDeps(ctx)
 	if err != nil {
 		return nil, err
@@ -38,13 +36,12 @@ func NewApp(ctx context.Context) (*App, error) {
 }
 
 func (a *App) Run() error {
-	a.runHTTPServer()
-	return nil
+	return a.runHTTPServer()
 }
 
 func (a *App) initDeps(ctx context.Context) error {
 	inits := []func(context.Context) error{
-		a.initEnvironment,
+		a.initConfig,
 		a.initHTTPHandler,
 	}
 
@@ -58,14 +55,22 @@ func (a *App) initDeps(ctx context.Context) error {
 	return nil
 }
 
-func (a *App) initEnvironment(_ context.Context) error {
-	if !config.EnvExists("APP.SERVER.PORT") {
-		err := config.EnvLoad(".env")
+func (a *App) initConfig(_ context.Context) error {
+
+	a.log = slogger.NewLogger(os.Stdout, slogger.WithJSON(true))
+	a.gokitLogger = gokitlogger.NewLogger(os.Stdout, gokitlogger.WithJSON(true))
+
+	if config.CountWithPrefix("app.") == 0 {
+
+		a.log = slogger.NewLogger(os.Stdout)
+		a.gokitLogger = gokitlogger.NewLogger(os.Stdout)
+
+		err := config.Load(".env")
 		if err != nil {
 			return err
 		}
 	}
-	a.log.Info("app", "environment", config.EnvInfo())
+	a.log.Info("app", "environment", config.GetWithPrefix("app.", "password", "secret"))
 	return nil
 }
 
@@ -95,7 +100,7 @@ func (a *App) initHTTPHandler(_ context.Context) error {
 	return nil
 }
 
-func (a *App) runHTTPServer() {
+func (a *App) runHTTPServer() error {
 	var (
 		httpAddr = flag.String("http.addr", a.serverConfig.ServerPort(), "HTTP listen address")
 	)
@@ -114,4 +119,6 @@ func (a *App) runHTTPServer() {
 	}()
 
 	a.gokitLogger.Log("exit", <-errs)
+
+	return nil
 }
