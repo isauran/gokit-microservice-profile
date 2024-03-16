@@ -13,7 +13,7 @@ import (
 	"github.com/go-kit/log"
 	"github.com/isauran/gokit-microservice-profile/internal/config"
 	profileService "github.com/isauran/gokit-microservice-profile/internal/service/profile"
-	"github.com/isauran/gokit-microservice-profile/pkg/logger"
+	"github.com/isauran/go-pkg/logger"
 )
 
 type App struct {

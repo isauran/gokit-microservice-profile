@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/isauran/gokit-microservice-profile/internal/app"
-	"github.com/isauran/gokit-microservice-profile/pkg/logger"
+	"github.com/isauran/go-pkg/logger"
 )
 
 func main() {
