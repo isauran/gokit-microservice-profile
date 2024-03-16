@@ -11,9 +11,11 @@ import (
 	"syscall"
 
 	"github.com/go-kit/log"
-	"github.com/isauran/gokit-microservice-profile/internal/config"
-	profileService "github.com/isauran/gokit-microservice-profile/internal/service/profile"
+	"github.com/gorilla/mux"
 	"github.com/isauran/go-pkg/logger"
+	"github.com/isauran/gokit-microservice-profile/internal/config"
+	customerService "github.com/isauran/gokit-microservice-profile/internal/service/customer"
+	profileService "github.com/isauran/gokit-microservice-profile/internal/service/profile"
 )
 
 type App struct {
@@ -78,10 +80,18 @@ func (a *App) initHTTPHandler(_ context.Context) error {
 		a.serverConfig = cfg
 	}
 
-	var s profileService.Service
-	s = profileService.NewInmemService()
-	s = profileService.LoggingMiddleware(a.gokitLogger)(s)
-	a.handler = profileService.MakeHTTPHandler(s, log.With(a.gokitLogger, "component", "HTTP"))
+	r := mux.NewRouter()
+
+	var profileSvc profileService.Service
+	profileSvc = profileService.NewInmemService()
+	profileSvc = profileService.LoggingMiddleware(a.gokitLogger)(profileSvc)
+	a.handler = profileService.MakeHTTPHandler(r, profileSvc, log.With(a.gokitLogger, "component", "HTTP"))
+
+	var customerSvc customerService.Service
+	customerSvc = customerService.NewInmemService()
+	customerSvc = customerService.LoggingMiddleware(a.gokitLogger)(customerSvc)
+	a.handler = customerService.MakeHTTPHandler(r, customerSvc, log.With(a.gokitLogger, "component", "HTTP"))
+
 	return nil
 }
 
