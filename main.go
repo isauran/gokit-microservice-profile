@@ -2,19 +2,26 @@ package main
 
 import (
 	"context"
+	"os"
+
 	"github.com/isauran/gokit-microservice-profile/internal/app"
-	"log"
+	"github.com/isauran/slogger"
 )
 
 func main() {
 	ctx := context.Background()
-	a, err := app.NewApp(ctx)
+
+	log := slogger.NewLogger(os.Stdout, slogger.WithJSON(true))
+
+	a, err := app.NewApp(ctx, log)
 	if err != nil {
-		log.Fatalf("failed to init app %s", err)
+		log.Error("failed to init app", err)
+		os.Exit(1)
 	}
 
 	err = a.Run()
 	if err != nil {
-		log.Fatalf("failed to run app %s", err)
+		log.Error("failed to run app", err)
+		os.Exit(1)
 	}
 }

@@ -10,22 +10,17 @@ import (
 	"os/signal"
 	"syscall"
 
-	gokitlog "github.com/go-kit/log"
 	"github.com/isauran/gokit-microservice-profile/internal/config"
-	"github.com/isauran/gokit-microservice-profile/internal/service"
-	"github.com/isauran/gokitlogger"
-	"github.com/isauran/slogger"
+	"github.com/isauran/gokit-microservice-profile/internal/app/provider"
 )
 
 type App struct {
-	log          *slog.Logger
-	gokitLogger  gokitlog.Logger
-	handler      http.Handler
-	serverConfig config.ServerConfig
+	log             *slog.Logger
+	serviceProvider *provider.ServiceProvider
 }
 
-func NewApp(ctx context.Context) (*App, error) {
-	a := &App{}
+func NewApp(ctx context.Context, l *slog.Logger) (*App, error) {
+	a := &App{log: l}
 	err := a.initDeps(ctx)
 	if err != nil {
 		return nil, err
@@ -34,13 +29,13 @@ func NewApp(ctx context.Context) (*App, error) {
 }
 
 func (a *App) Run() error {
-	return a.runHTTPServer()
+	return a.ListenAndServe()
 }
 
 func (a *App) initDeps(ctx context.Context) error {
 	inits := []func(context.Context) error{
-		a.initConfig,
-		a.initHTTPHandler,
+		a.initEnvironment,
+		a.initServiceProvider,
 	}
 
 	for _, f := range inits {
@@ -53,15 +48,9 @@ func (a *App) initDeps(ctx context.Context) error {
 	return nil
 }
 
-func (a *App) initConfig(_ context.Context) error {
-
-	a.log = slogger.NewLogger(os.Stdout, slogger.WithJSON(true))
-	a.gokitLogger = gokitlogger.NewLogger(os.Stdout, gokitlogger.WithJSON(true))
+func (a *App) initEnvironment(_ context.Context) error {
 
 	if config.CountWithPrefix("app.") == 0 {
-
-		a.log = slogger.NewLogger(os.Stdout)
-		a.gokitLogger = gokitlogger.NewLogger(os.Stdout)
 
 		err := config.Load(".env")
 		if err != nil {
@@ -69,27 +58,18 @@ func (a *App) initConfig(_ context.Context) error {
 		}
 	}
 
-	if a.serverConfig == nil {
-		cfg, err := config.NewServerConfig()
-		if err != nil {
-			a.log.Error("failed to get server config", "error", err.Error())
-			os.Exit(1)
-		}
-		a.serverConfig = cfg
-	}
-
 	a.log.Info("app", "environment", config.GetWithPrefix("app.", "password", "secret"))
 	return nil
 }
 
-func (a *App) initHTTPHandler(_ context.Context) error {
-	a.handler = service.MakeHTTPHandler(a.gokitLogger)
+func (a *App) initServiceProvider(_ context.Context) error {
+	a.serviceProvider = provider.NewServiceProvider(a.log)
 	return nil
 }
 
-func (a *App) runHTTPServer() error {
+func (a *App) ListenAndServe() error {
 	var (
-		httpAddr = flag.String("http.addr", a.serverConfig.ServerPort(), "HTTP listen address")
+		httpAddr = flag.String("http.addr", a.serviceProvider.ServerConfig().ServerPort(), "HTTP listen address")
 	)
 	flag.Parse()
 
@@ -101,11 +81,10 @@ func (a *App) runHTTPServer() error {
 	}()
 
 	go func() {
-		a.gokitLogger.Log("transport", "HTTP", "addr", *httpAddr)
-		errs <- http.ListenAndServe(*httpAddr, a.handler)
+		a.log.Info("server", "transport", "HTTP", "addr", *httpAddr)
+		errs <- http.ListenAndServe(*httpAddr, a.serviceProvider.HTTPHandler())
 	}()
 
-	a.gokitLogger.Log("exit", <-errs)
-
-	return nil
+	a.log.Error("server", "exit", <-errs)
+	return <-errs
 }
