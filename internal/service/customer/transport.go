@@ -16,7 +16,7 @@ import (
 
 	"github.com/go-kit/kit/transport"
 	httptransport "github.com/go-kit/kit/transport/http"
-	"github.com/isauran/gokitlogger"
+	"github.com/isauran/logger"
 )
 
 var (
@@ -28,7 +28,7 @@ var (
 // MakeHTTPHandler mounts all of the service endpoints into an http.Handler.
 // Useful in a customersvc server.
 func MakeHTTPHandler(r *mux.Router, s Service) http.Handler {
-	logger := gokitlogger.NewLogger(os.Stdout, gokitlogger.WithJSON(true))
+	logger := logger.NewGoKitLogger(os.Stdout, logger.WithJSON(true))
 	e := MakeServerEndpoints(s)
 	options := []httptransport.ServerOption{
 		httptransport.ServerErrorHandler(transport.NewLogErrorHandler(logger)),

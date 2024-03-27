@@ -5,13 +5,13 @@ import (
 	"os"
 
 	"github.com/isauran/gokit-microservice-profile/internal/app"
-	"github.com/isauran/slogger"
+	"github.com/isauran/logger"
 )
 
 func main() {
 	ctx := context.Background()
 
-	log := slogger.NewLogger(os.Stdout, slogger.WithJSON(true))
+	log := logger.NewLogger(os.Stdout, logger.WithJSON(true))
 
 	a, err := app.NewApp(ctx, log)
 	if err != nil {
